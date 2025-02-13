@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Maşa ve Ayı Oyunu</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: linear-gradient(to bottom, #87CEEB, #E0F7FA);
+            font-family: Arial, sans-serif;
+            cursor: pointer;
+        }
+        #game-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+        .character-select {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 2rem;
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+        }
+        .character-card {
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s;
+            padding: 1rem;
+            border-radius: 10px;
+            border: 2px solid #ddd;
+        }
+        .character-card:hover {
+            transform: scale(1.05);
+            background: #f0f0f0;
+            border-color: #4CAF50;
+        }
+        .character-img {
+            width: 200px;
+            height: 200px;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            object-fit: cover;
+        }
+        .heart-container {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            user-select: none;
+            cursor: pointer;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+        .heart-container:hover {
+            transform: scale(1.1);
+        }
+        .heart-bg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            font-size: 80px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #ff4d4d;
+        }
+        .character-icon {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid white;
+            background: #fff;
+        }
+        #score, #timer, #player {
+            position: fixed;
+            font-size: 24px;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            background: rgba(0,0,0,0.5);
+            padding: 10px 20px;
+            border-radius: 10px;
+            z-index: 100;
+        }
+        #score { top: 20px; left: 20px; }
+        #timer { top: 20px; right: 20px; }
+        #player { 
+            top: 20px; 
+            left: 50%; 
+            transform: translateX(-50%);
+        }
+        .screen {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+        button {
+            background: #4CAF50;
+            border: none;
+            color: white;
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .hidden {
+            display: none !important;
+        }
+        #message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            opacity: 0;
+            transition: opacity 0.5s;
+            z-index: 900;
+            pointer-events: none;
+        }
+        #tutorial {
+            position: fixed;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 18px;
+            text-align: center;
+            z-index: 800;
+            transition: opacity 0.5s;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <div id="score">Puan: 0</div>
+        <div id="timer">Süre: 45</div>
+        <div id="player"></div>
+        <div id="message"></div>
+        <div id="tutorial" class="hidden"></div>
+    </div>
+
+    <div id="character-select" class="screen">
+        <h1>Karakterini Seç!</h1>
+        <div class="character-select">
+            <div class="character-card" onclick="selectCharacter('masha')">
+                <img src="https://niceyaslara.com/wp-content/uploads/2024/01/masha-oturan-maketi.jpg" alt="Maşa" class="character-img">
+                <h2>Maşa</h2>
+                <p>Ayı kalpleri topla!</p>
+            </div>
+            <div class="character-card" onclick="selectCharacter('bear')">
+                <img src="https://niceyaslara.com/wp-content/uploads/2024/01/koca-ayi-maketi.jpg" alt="Ayı" class="character-img">
+                <h2>Ayı</h2>
+                <p>Maşa kalpleri topla!</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="end-screen" class="screen hidden">
+        <h1>Oyun Bitti!</h1>
+        <p>Toplam Puanın: <span id="final-score">0</span></p>
+        <p id="achievement"></p>
+        <button onclick="restartGame()">Tekrar Oyna</button>
+    </div>
+
+    <script>
+        let score = 0;
+        let timer = 45;
+        let gameInterval;
+        let timerInterval;
+        let isGameActive = false;
+        let selectedCharacter = '';
+
+        function selectCharacter(character) {
+            selectedCharacter = character;
+            document.getElementById('character-select').classList.add('hidden');
+            
+            // Oyun talimatlarını göster
+            const tutorial = document.getElementById('tutorial');
+            tutorial.textContent = character === 'masha' ? 
+                'Ayı olan kalpleri topla! Maşa olan kalpleri alma!' :
+                'Maşa olan kalpleri topla! Ayı olan kalpleri alma!';
+            tutorial.classList.remove('hidden');
+            
+            document.getElementById('player').textContent = 
+                `Seçilen Karakter: ${character === 'masha' ? 'Maşa' : 'Ayı'}`;
+            
+            // 3 saniye sonra talimatları gizle
+            setTimeout(() => {
+                tutorial.classList.add('hidden');
+            }, 3000);
+            
+            startGame();
+        }
+
+        function createHeart() {
+            if (!isGameActive) return;
+
+            const heartContainer = document.createElement('div');
+            heartContainer.className = 'heart-container';
+            
+            const heartBg = document.createElement('div');
+            heartBg.className = 'heart-bg';
+            heartBg.textContent = '❤️';
+            heartContainer.appendChild(heartBg);
+
+            const isTargetHeart = Math.random() < 0.6;
+            const heartType = isTargetHeart ? 
+                (selectedCharacter === 'masha' ? 'bear' : 'masha') : 
+                (selectedCharacter === 'masha' ? 'masha' : 'bear');
+            
+            const characterIcon = document.createElement('img');
+            characterIcon.className = 'character-icon';
+            characterIcon.src = heartType === 'masha' ? 
+                'https://niceyaslara.com/wp-content/uploads/2024/01/masha-oturan-maketi.jpg' : 
+                'https://niceyaslara.com/wp-content/uploads/2024/01/koca-ayi-maketi.jpg';
+            characterIcon.alt = heartType === 'masha' ? 'Maşa' : 'Ayı';
+            heartContainer.appendChild(characterIcon);
+
+            heartContainer.dataset.type = heartType;
+            heartContainer.style.left = Math.random() * (window.innerWidth - 80) + 'px';
+            heartContainer.style.top = '-80px';
+
+            heartContainer.onclick = () => {
+                if (!isGameActive) return;
+                
+                if (selectedCharacter === 'masha' && heartType === 'bear' ||
+                    selectedCharacter === 'bear' && heartType === 'masha') {
+                    score += 10;
+                    showMessage('Harika! +10 🌟');
+                    heartContainer.style.transform = 'scale(1.5)';
+                } else {
+                    score -= 5;
+                    showMessage('Yanlış kalp! -5 ❌');
+                    heartContainer.style.transform = 'rotate(45deg)';
+                }
+                
+                heartContainer.style.opacity = '0';
+                setTimeout(() => heartContainer.remove(), 300);
+                updateScore();
+            };
+
+            document.getElementById('game-container').appendChild(heartContainer);
+
+            let position = -80;
+            const fallInterval = setInterval(() => {
+                if (!isGameActive) {
+                    clearInterval(fallInterval);
+                    return;
+                }
+
+                position += 3;
+                heartContainer.style.top = position + 'px';
+
+                if (position > window.innerHeight) {
+                    clearInterval(fallInterval);
+                    heartContainer.remove();
+                }
+            }, 20);
+        }
+
+        function showMessage(text) {
+            const message = document.getElementById('message');
+            message.textContent = text;
+            message.style.opacity = '1';
+            setTimeout(() => {
+                message.style.opacity = '0';
+            }, 500);
+        }
+
+        function startGame() {
+            isGameActive = true;
+            score = 0;
+            timer = 45;
+            updateScore();
+            updateTimer();
+            
+            gameInterval = setInterval(createHeart, 1000);
+            timerInterval = setInterval(() => {
+                timer--;
+                updateTimer();
+                if (timer <= 0) endGame();
+            }, 1000);
+        }
+
+        function updateScore() {
+            document.getElementById('score').textContent = `Puan: ${score}`;
+        }
+
+        function updateTimer() {
+            document.getElementById('timer').textContent = `Süre: ${timer}`;
+        }
+
+        function endGame() {
+            isGameActive = false;
+            clearInterval(gameInterval);
+            clearInterval(timerInterval);
+            
+            const hearts = document.querySelectorAll('.heart-container');
+            hearts.forEach(heart => heart.remove());
+
+            document.getElementById('end-screen').classList.remove('hidden');
+            document.getElementById('final-score').textContent = score;
+
+            let achievement = '';
+            if (score >= 200) achievement = '🏆 Maşa ile koca ayı hep birlikte!';
+            else if (score >= 150) achievement = '💝 Ha gayret!';
+            else if (score >= 100) achievement = '💖 Daha iyi olabilir!';
+            else achievement = '💕 Daha çok özen göstermelisin!';
+
+            document.getElementById('achievement').textContent = achievement;
+        }
+
+        function restartGame() {
+            document.getElementById('end-screen').classList.add('hidden');
+            document.getElementById('character-select').classList.remove('hidden');
+            selectedCharacter = '';
+        }
+    </script>
+</body>
+</html>
