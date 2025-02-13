@@ -294,9 +294,12 @@
             heartContainer.appendChild(characterIcon);
 
             heartContainer.dataset.type = heartType;
-            // Hesaplanan genişlikle ekran genişliği aralığında konumlandırma
-            heartContainer.style.left = Math.random() * (window.innerWidth - parseInt(getComputedStyle(heartContainer).width)) + 'px';
-            heartContainer.style.top = '-80px';
+            
+            // Ekranın genişliğine bağlı olarak kalp genişliğini ayarla
+            const heartWidth = window.innerWidth < 600 ? 60 : 80;
+            // Kalplerin yatay konumunu tamamen rastgele belirle
+            heartContainer.style.left = Math.random() * (window.innerWidth - heartWidth) + 'px';
+            heartContainer.style.top = -heartWidth + 'px';
 
             heartContainer.onclick = () => {
                 if (!isGameActive) return;
@@ -319,7 +322,7 @@
 
             document.getElementById('game-container').appendChild(heartContainer);
 
-            let position = -80;
+            let position = -heartWidth;
             const fallInterval = setInterval(() => {
                 if (!isGameActive) {
                     clearInterval(fallInterval);
