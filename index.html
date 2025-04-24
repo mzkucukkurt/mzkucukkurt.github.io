@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hukuk Chat Botu - Anında Hukuki Bilgi</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        /* İsteğe bağlı özel stiller buraya eklenebilir */
+        .bg-hero-pattern {
+            background-image: url('your-background-image.jpg'); /* Arka plan görselinizi buraya ekleyin */
+            background-size: cover;
+            background-position: center;
+        }
+        /* Mobil görünümde hero section yüksekliğini ayarlayabilirsiniz */
+        @media (max-width: 767px) { /* Tailwind'in 'md' kırılma noktasından küçük ekranlar */
+            .bg-hero-pattern {
+                padding-top: 6rem; /* Mobil için daha fazla üst boşluk */
+                padding-bottom: 6rem; /* Mobil için daha fazla alt boşluk */
+            }
+        }
+    </style>
+</head>
+<body class="font-sans bg-gray-100">
+
+    <header class="bg-blue-700 text-white py-12 px-4 text-center bg-hero-pattern">
+        <div class="container mx-auto">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">Anında Hukuki Bilgiye Ulaşın</h1>
+            <p class="text-xl mb-8">Sorularınıza hızlı ve güvenilir yanıtlar alın. Hukuki süreçlerde yanınızdayız.</p>
+            <div id="chatbot-widget-container" class="mt-8 flex justify-center">
+                <button id="open-chatbot" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-full text-lg transition duration-300 ease-in-out shadow-lg">
+                    Chat Botu Aç
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto py-12 px-4">
+        <section class="text-center mb-12">
+            <h2 class="text-3xl font-bold mb-4">Nasıl Çalışır?</h2>
+            <p class="text-lg text-gray-700 max-w-2xl mx-auto">Chat botumuz, sıkça sorulan hukuki sorulara anında yanıt vermek için gelişmiş yapay zeka kullanır. Karmaşık durumlarda sizi ilgili kaynaklara veya profesyonellere yönlendirebilir.</p>
+        </section>
+
+        <section class="text-center">
+            <h2 class="text-3xl font-bold mb-4">Denemeye Başlayın</h2>
+            <p class="text-lg text-gray-700 mb-8">Hukuki sorularınız için anında destek alın. Chat botumuzu şimdi deneyin!</p>
+             <div id="chatbot-widget-container-alt" class="flex justify-center">
+                 </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-800 text-white py-6 text-center">
+        <p>&copy; 2023 [Şirket Adınız/Web Siteniz]. Tüm Hakları Saklıdır.</p>
+    </footer>
+<script
+  data-embed-id="d55cf453-1186-4413-9cd4-18f0d871c6ea"
+  data-base-api-url="https://5hdnps6u.rpcld.app/api/embed"
+  data-chat-icon="chatBubble"
+  data-brand-image-url="https://upload.wikimedia.org/wikipedia/commons/b/b4/Flag_of_Turkey.svg"
+  data-assistant-icon="https://upload.wikimedia.org/wikipedia/commons/b/b4/Flag_of_Turkey.svg"
+  data-show-thoughts="true"
+  data-sponsor-link="https://x.com/mzkucukkurt"
+  data-sponsor-text="Atabey Hukuk ve Danışmanlık"
+  data-assistant-name="Av. Ata Bey"
+  src="https://5hdnps6u.rpcld.app/embed/anythingllm-chat-widget.min.js">
+</script>
+
+
+</body>
+</html>
